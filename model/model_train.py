@@ -10,30 +10,7 @@ import time
 import torch.nn.functional as F
 import datetime
 import os
-# parametersetting 
-class Args:
-    def __init__(self):
-        self.num_classes = 10
-        self.epochs = 100
-        self.lr = 0.001
-        self.batch_size = 256
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.whether_pretrained = False
-        self.whether_save = False
-        self.save_name = None
-        self.seed = 42
-        self.reprogram_model = None
-        self.model = "resnet18"
-        self.seed = 0 
-        self.patch_size = 8
-        self.attribute_channels = 3 
-        self.attribute_layers = 5
-        self.fraction = 1.0 
-        self.local_import_model = True
-        self.mapping_method = "rlm"
-        self.imgsize = 224
-        self.attr_gamma = 0.1
-        self.attr_lr = 0.01
+from config import Args
 
 # fully finetune the pretrained model 
 def train_resnet_model(train_dataset, 
@@ -41,16 +18,29 @@ def train_resnet_model(train_dataset,
                        num_classes, 
                        log_dir="runs/exp",
                       agrs=None,
-                       save_name=None):
+                       save_name=None,
+                       pretrained_path=None):
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     args = Args()
+
+
+
+
     # Load ResNet18
     model = models.resnet18(pretrained=args.whether_pretrained)
     model.fc = nn.Linear(model.fc.in_features, num_classes)
     model = model.to(device)
 
-    # Loss and optimizer
+    # load the weights
+    if pretrained_path is not None:
+        state_dict = torch.load(pretrained_path, map_location=device)
+        model.load_state_dict(state_dict)
+        print(f"Loaded pretrained weights from {pretrained_path}")
+
+    model = model.to(device)
+
+    # Loss and optimizers
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
@@ -146,7 +136,6 @@ def reprogram_model(train_dataset,test_dataset,base_model):
                                                     gamma=args.attr_gamma)
     class_names = [str(i) for i in range(args.num_classes)]
     if args.mapping_method == 'rlm':
-        # 获取模型输出维度
         with torch.no_grad():
             dummy_input = torch.randn(1, 3, args.imgsize, args.imgsize).to(device)
             output_dim = base_model(dummy_input).shape[1]
@@ -267,3 +256,19 @@ def reprogram_model(train_dataset,test_dataset,base_model):
 #    test_dataset_real,
 #    model
 # )
+
+
+# Example of using the train_resnet_model function for downstream fine-tuning
+
+# Define number of classes
+num_classes = len(train_dataset_real.classes)
+
+# Call the training function
+
+train_resnet_model(
+    train_dataset=train_dataset_real,
+    test_dataset=test_dataset_real,
+    num_classes=num_classes,
+    log_dir="runs/downstream_finetune",
+    pretrained_path="resnet_quickdraw_30class.pth",
+)
