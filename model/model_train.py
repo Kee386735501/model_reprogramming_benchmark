@@ -5,14 +5,18 @@ from torchvision import models
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
-
-# 参数设置
+from torch.cuda.amp import autocast, GradScaler
+import time
+import torch.nn.functional as F
+import datetime
+import os
+# parametersetting 
 class Args:
     def __init__(self):
         self.num_classes = 10
-        self.epochs = 50
+        self.epochs = 100
         self.lr = 0.001
-        self.batch_size = 64
+        self.batch_size = 256
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.whether_pretrained = False
         self.whether_save = False
@@ -25,13 +29,13 @@ class Args:
         self.attribute_channels = 3 
         self.attribute_layers = 5
         self.fraction = 1.0 
-        self.local_import_model = False
+        self.local_import_model = True
         self.mapping_method = "rlm"
         self.imgsize = 224
         self.attr_gamma = 0.1
         self.attr_lr = 0.01
 
-# 训练ResNet模型
+# fully finetune the pretrained model 
 def train_resnet_model(train_dataset, 
                        test_dataset, 
                        num_classes, 
@@ -111,35 +115,23 @@ def train_resnet_model(train_dataset,
 
 from smm import InstancewiseVisualPrompt
 
-# model reprogramming
+# model reprogramming method
+from functools import partial
 from smm import generate_label_mapping_by_frequency, label_mapping_base
-def reprogram_model(train_dataset,test_dataset,base_model,weight_path):
+from torch.cuda.amp import GradScaler
+def reprogram_model(train_dataset,test_dataset,base_model):
     args = Args()
-    if args.network == "ViT_B32":
+    device = args.device
+    if args.model == "ViT_B32":
         args.imgsize = 384
-    else:
+        
+
         args.imgsize = 224
     model = base_model
     # load the dataset 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
     
-    if device is None:
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # import the base model
-    if base_model == "resnet18":
-        # 如果是导入本地模型
-        if args.local_import_model:
-            base_model = models.resnet18(pretrained=False)
-            base_model.fc = nn.Linear(model.fc.in_features,30)
-            base_model.load_state_dict(torch.load('resnet_quickdraw_30class.pth'))
-            base_model.to("cuda" if torch.cuda.is_available() else "cpu")
-        else:
-            # 导入 imagenet 参数
-            from torchvision.models import resnet18, ResNet18_Weights
-            base_model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1).to(device)
-            base_model = models.resnet18(weight_path)
-            base_model.fc = nn.Linear(base_model.fc.in_features, args.num_classes)
     # initialize the visual prompting model
     base_model.requires_grad_(False)
     base_model.eval()
@@ -154,7 +146,12 @@ def reprogram_model(train_dataset,test_dataset,base_model,weight_path):
                                                     gamma=args.attr_gamma)
     class_names = [str(i) for i in range(args.num_classes)]
     if args.mapping_method == 'rlm':
-        mapping_sequence = torch.randperm(1000)[:len(class_names)]
+        # 获取模型输出维度
+        with torch.no_grad():
+            dummy_input = torch.randn(1, 3, args.imgsize, args.imgsize).to(device)
+            output_dim = base_model(dummy_input).shape[1]
+
+        mapping_sequence = torch.randperm(output_dim)[:len(class_names)]
         label_mapping = partial(label_mapping_base, mapping_sequence=mapping_sequence)
     elif args.mapping_method == 'flm':
         mapping_sequence = generate_label_mapping_by_frequency(visual_prompt, base_model, train_loader)
@@ -170,13 +167,15 @@ def reprogram_model(train_dataset,test_dataset,base_model,weight_path):
     scaler = GradScaler()
     print("start training")
 
-
+    # Tensorboard Write in
+    now = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_dir_smm = f"./logs/smm_{args.mapping_method}_{args.model}_{now}"
     log_dir_smm = f"./logs/smm"
+    os.makedirs(log_dir_smm, exist_ok=True)
     writer = SummaryWriter(log_dir=log_dir_smm)
 
-    from torch.cuda.amp import autocast, GradScaler
-    import torch.nn.functional as F
-    import time
+
+    # train loop
     for epoch in range(args.epochs):
         start_time = time.time()
         if args.mapping_method == 'ilm':
@@ -245,8 +244,6 @@ def reprogram_model(train_dataset,test_dataset,base_model,weight_path):
         writer.add_scalar("test/acc", acc, epoch)
         writer.add_scalar("test/loss", loss_sum / total_num, epoch)
 
-
-
         # save data 
         train_acc = tr_acc
         train_loss = loss_sum / total_num
@@ -256,16 +253,17 @@ def reprogram_model(train_dataset,test_dataset,base_model,weight_path):
         # ====== 写入日志文件 ======
         writer.flush()
 
-        # Save CKPT
-        state_dict = {
-            "visual_prompt_dict": visual_prompt.state_dict(),
-            "epoch": epoch,
-            "best_acc": best_acc,
-            "mapping_sequence": mapping_sequence,
-        }
-        if acc > best_acc:
-        #     best_acc = acc
-        #     state_dict['best_acc'] = best_acc
-        #     torch.save(state_dict, os.path.join(save_path, 'best.pth'))
-        # torch.save(state_dict, os.path.join(save_path, 'ckpt.pth'))
-            print(f"Epoch {epoch} best accuracy: {best_acc:.2f}%")
+
+
+
+# 下面是
+# model = models.resnet18(pretrained=False)
+# model.fc = nn.Linear(model.fc.in_features, 30)
+# model.load_state_dict(torch.load('resnet_quickdraw_30class.pth'))
+# model.to("cuda" if torch.cuda.is_available() else "cpu")
+            
+# reprogram_model(
+#    train_dataset_real,
+#    test_dataset_real,
+#    model
+# )
