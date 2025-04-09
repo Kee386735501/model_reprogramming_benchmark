@@ -1,5 +1,3 @@
-当然可以，以下是一个适用于你的 [model_reprogramming_benchmark](https://github.com/Kee386735501/model_reprogramming_benchmark) 项目的 `README.md` 草案模板，你可以根据具体内容再进一步修改补充：
-
 ---
 
 # Model Reprogramming Benchmark
