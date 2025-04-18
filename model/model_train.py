@@ -131,7 +131,7 @@ def reprogram_model(train_dataset,test_dataset,base_model):
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
                                                      milestones=[int(0.5 * args.epochs), int(0.72 * args.epochs)],
                                                      gamma=0.1)
-    scheduler_att = torch.optim.lr_scheduler.MultiStepLR(optimizer,
+    scheduler_att = torch.optim.lr_scheduler.MultiStepLR(optimizer_att,
                                                     milestones=[int(0.5 * args.epochs), int(0.72 * args.epochs)],
                                                     gamma=args.attr_gamma)
     class_names = [str(i) for i in range(args.num_classes)]
