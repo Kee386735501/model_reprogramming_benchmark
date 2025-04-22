@@ -13,7 +13,7 @@ import os
 from config import Args
 
 # fully finetune the pretrained model 
-def train_resnet_model(train_dataset, 
+def finetune_resnet_model(train_dataset, 
                        test_dataset, 
                        num_classes, 
                        log_dir="runs/exp",
@@ -157,9 +157,8 @@ def reprogram_model(train_dataset,test_dataset,base_model):
     print("start training")
 
     # Tensorboard Write in
-    now = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_dir_smm = f"./logs/smm_{args.mapping_method}_{args.model}_{now}"
-    log_dir_smm = f"./logs/smm"
+    # now = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_dir_smm = f"./logs/{args.model}_{args.source}_to_{args.target}_{args.mapping_method}_mr{args.mr_ratio}"
     os.makedirs(log_dir_smm, exist_ok=True)
     writer = SummaryWriter(log_dir=log_dir_smm)
 
