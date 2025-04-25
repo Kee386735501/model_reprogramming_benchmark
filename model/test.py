@@ -13,7 +13,7 @@ from torch.utils.tensorboard import SummaryWriter
 import csv
 import os
 import matplotlib.pyplot as plt
-
+import time 
 
 
 # network for patch-wise mask
@@ -401,7 +401,7 @@ class FastNoisyDataset(Dataset):
 
 
 def get_noisy_dataset(base_dataset: Dataset, noise_type: str = "gaussian", noise_level: float = 0.1) -> Dataset:
-    return NoisyDataset(base_dataset, noise_type=noise_type, noise_level=noise_level)
+    return FastNoisyDataset(base_dataset, noise_type=noise_type, noise_level=noise_level)
 
 
 
