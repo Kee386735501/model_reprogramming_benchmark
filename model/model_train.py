@@ -12,6 +12,10 @@ import datetime
 import os
 from config import Args
 
+
+
+
+
 # fully finetune the pretrained model 
 def finetune_resnet_model(train_dataset, 
                        test_dataset, 
@@ -242,6 +246,23 @@ def reprogram_model(train_dataset,test_dataset,base_model):
         writer.flush()
 
 
+# 线性探测（linear probe）
+def linear_probe(train_dataset, test_dataset, base_model):
+    args = Args()
+    device = args.device
+    if args.model == "ViT_B32":
+        args.imgsize = 224
+    model = base_model
+    for param in model.parameters():
+        param.requires_grad = False
+    
+    # Linear Classifier
+    if base_model == "resnet":
+        model.fc = nn.Linear(model.fc.in_features, args.num_classes)
+    elif base_model == "vit":
+        model.head = nn.Linear(model.head.in_features, args.num_classes)
+    model = model.to(device)
+
 
 
 # 下面是
@@ -260,14 +281,14 @@ def reprogram_model(train_dataset,test_dataset,base_model):
 # Example of using the train_resnet_model function for downstream fine-tuning
 
 # Define number of classes
-num_classes = len(train_dataset_real.classes)
+# num_classes = len(train_dataset_real.classes)
 
-# Call the training function
+# # Call the training function
 
-train_resnet_model(
-    train_dataset=train_dataset_real,
-    test_dataset=test_dataset_real,
-    num_classes=num_classes,
-    log_dir="runs/downstream_finetune",
-    pretrained_path="resnet_quickdraw_30class.pth",
-)
+# train_resnet_model(
+#     train_dataset=train_dataset_real,
+#     test_dataset=test_dataset_real,
+#     num_classes=num_classes,
+#     log_dir="runs/downstream_finetune",
+#     pretrained_path="resnet_quickdraw_30class.pth",
+# )

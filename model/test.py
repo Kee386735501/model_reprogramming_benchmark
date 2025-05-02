@@ -14,6 +14,122 @@ import csv
 import os
 import matplotlib.pyplot as plt
 import time 
+from torchvision.datasets import SVHN
+import random
+from torch.utils.data import Subset, DataLoader
+
+
+
+# linear probe method
+def linear_probe(train_dataset, test_dataset, base_model):
+    args = Args()
+    device = args.device
+    # 冻结参数
+    for parameter in base_model.parameters():
+        parameter.requires_grad = False
+    # 线性分类器(resnet or vit)
+    if hasattr(base_model,"fc"):
+        feature_dim = base_model.fc.in_features
+        base_model.fc = nn.Linear(feature_dim, args.num_classes)
+    elif hasattr(base_model,"head"):
+        feature_dim = base_model.heads.head.in_features
+        base_model.heads = nn.Linear(feature_dim, args.num_classes)
+    else:
+        raise ValueError("Model does not have a linear layer to replace")
+    base_model = base_model.to(device)
+    # 优化器 & 损失函数
+    optimizer = torch.optim.Adam(base_model.parameters(), lr=args.lr)
+    criterion = nn.CrossEntropyLoss()
+
+    # 数据加载器
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+
+    # 日志记录
+    writer = SummaryWriter(log_dir=f"./logs/linear_probe_{args.model}")
+    best_acc = 0
+
+    print("Start linear probe training")
+    for epoch in range(args.epochs):
+        base_model.train()
+        correct = 0
+        total = 0
+        train_loss = 0.0
+
+        for x, y in tqdm(train_loader, desc=f"Epoch {epoch+1}/{args.epochs}"):
+            x, y = x.to(device), y.to(device)
+            optimizer.zero_grad()
+            logits = base_model(x)
+            loss = criterion(logits, y)
+            loss.backward()
+            optimizer.step()
+
+            train_loss += loss.item() * x.size(0)
+            preds = torch.argmax(logits, dim=1)
+            correct += (preds == y).sum().item()
+            total += y.size(0)
+
+        train_acc = correct / total
+        writer.add_scalar("train/loss", train_loss / total, epoch)
+        writer.add_scalar("train/acc", train_acc, epoch)
+
+        # 验证
+        base_model.eval()
+        correct = 0
+        total = 0
+        test_loss = 0.0
+        with torch.no_grad():
+            for x, y in test_loader:
+                x, y = x.to(device), y.to(device)
+                logits = base_model(x)
+                loss = criterion(logits, y)
+                test_loss += loss.item() * x.size(0)
+                preds = torch.argmax(logits, dim=1)
+                correct += (preds == y).sum().item()
+                total += y.size(0)
+
+        test_acc = correct / total
+        writer.add_scalar("test/loss", test_loss / total, epoch)
+        writer.add_scalar("test/acc", test_acc, epoch)
+
+        print(f"Epoch {epoch+1} | Train Acc: {train_acc:.4f} | Test Acc: {test_acc:.4f}")
+
+        best_acc = max(best_acc, test_acc)
+
+    print(f"Best Test Accuracy: {best_acc:.4f}")
+    writer.close()
+
+
+
+
+
+def get_partial_dataset(dataset, fraction=1.0, seed=42):
+    """
+    Args:
+        dataset: 原始完整的数据集（比如 CIFAR10 的 train_dataset）
+        fraction: 取多少比例（比如0.5表示用50%的数据）
+        seed: 随机种子，保证可复现性
+    Returns:
+        Subset对象，只包含部分数据
+    """
+    if fraction >= 1.0:
+        return dataset  # 如果fraction>=1，就直接返回原dataset
+
+    # 计算要取的样本数
+    num_samples = int(len(dataset) * fraction)
+
+    # 随机采样indices
+    random.seed(seed)
+    indices = random.sample(range(len(dataset)), num_samples)
+
+    # 用 Subset 包装
+    partial_dataset = Subset(dataset, indices)
+
+    return partial_dataset
+
+
+
+
 
 
 # network for patch-wise mask
@@ -191,19 +307,18 @@ import torch
 
 class Args:
     def __init__(self):
-        self.source = "cifar10"
-        self.target = "cifar10"
+        self.source = "svhn"
+        self.target = "svhn"
         self.mr_ratio = 1.0  # or other default
-        self.num_classes = 10
-        self.epochs = 100
-        self.lr = 0.001
-        self.batch_size = 256
+        self.num_classes = 100
+        self.epochs = 50
+        self.lr = 0.01
+        self.batch_size = 512
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.whether_pretrained = True
         self.whether_save = False
         self.save_name = None
         self.seed = 42
-        self.model = "resnet18"
         self.patch_size = 8
         self.attribute_channels = 3 
         self.attribute_layers = 5
@@ -213,6 +328,7 @@ class Args:
         self.imgsize = 224
         self.attr_gamma = 0.1
         self.attr_lr = 0.01
+        self.model = "ViT_B32"  # or other default
 
 
 
@@ -393,18 +509,58 @@ class FastNoisyDataset(Dataset):
 
         return img, label
 
+from torchvision.datasets import CIFAR100, SVHN
 
+def get_dataset(name,
+                root: str = './data',
+                image_size: int = 224,
+                download: bool = True):
 
+    if name == "cifar100":
+        transform = transforms.Compose([
+            transforms.Resize(image_size),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.5071, 0.4867, 0.4408],  # CIFAR-100 官方统计
+                                 std=[0.2675, 0.2565, 0.2761])
+        ])
+        train_dataset = CIFAR100(root=root, train=True, transform=transform, download=download)
+        test_dataset = CIFAR100(root=root, train=False, transform=transform, download=download)
+        num_classes = 100
 
+    elif name == "svhn":
+        transform = transforms.Compose([
+            transforms.Resize(image_size),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.4377, 0.4438, 0.4728],  # SVHN 官方统计
+                                 std=[0.1980, 0.2010, 0.1970])
+        ])
+        train_dataset = SVHN(root=root, split='train', transform=transform, download=download)
+        test_dataset = SVHN(root=root, split='test', transform=transform, download=download)
+        num_classes = 10
 
+    else:
+        raise ValueError(f"Unsupported dataset: {name}")
 
+    return train_dataset, test_dataset, num_classes
 
 
 def get_noisy_dataset(base_dataset: Dataset, noise_type: str = "gaussian", noise_level: float = 0.1) -> Dataset:
     return FastNoisyDataset(base_dataset, noise_type=noise_type, noise_level=noise_level)
 
 
-
+def get_model(name: str, pretrained: bool = True):
+    if name == "resnet18":
+        model = models.resnet18(pretrained=pretrained)
+        # model.fc = nn.Identity()  # 去掉最后的全连接层
+    elif name == "vit_b_16":
+        from torchvision.models import vit_b_16,ViT_B_16_Weights
+        weights = ViT_B_16_Weights.DEFAULT if pretrained else None
+        model = vit_b_16(weights=weights)
+        # model.heads = nn.Linear(768,100)
+        image_size = 224
+    else:
+        raise ValueError(f"Unsupported model: {name}")
+    return model, image_size
 
 # prepare dataset 
 
@@ -419,34 +575,46 @@ transform = transforms.Compose([
                          std=[0.229, 0.224, 0.225]),
 ])
 
-train_dataset = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-test_dataset = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+
+# svhn_test_dataset = SVHN(root='./data', split='test', download=True, transform=transform)
+# svhn_transform = transforms.Compose([
+#     transforms.Resize(224),
+#     transforms.ToTensor(),
+#     transforms.Normalize(mean=[0.4377, 0.4438, 0.4728], std=[0.1980, 0.2010, 0.1970])  # SVHN 统计
+# ])
+
+
+
+# train_dataset = datasets.CIFAR100(root='./data', train=True, download=True, transform=transform)
+# test_dataset = datasets.CIFAR100(root='./data', train=False, download=True, transform=transform)
 
 # train_loader = DataLoader(train_dataset, batch_size=256, shuffle=True, num_workers=12, prefetch_factor=2, persistent_workers=True)
 # test_loader = DataLoader(test_dataset, batch_size=256, shuffle=False, num_workers=12, prefetch_factor=2, persistent_workers=True)
 
-
+train_dataset,test_dataset,num_classes = get_dataset(name="cifar100", root="./data", image_size=224, download=True)
 # add noise to dataset
-noisy_train_dataset = get_noisy_dataset(train_dataset, noise_type="gaussian", noise_level=0.1)
-noisy_test_dataset = get_noisy_dataset(test_dataset, noise_type="gaussian", noise_level=0.1)
+noisy_train_dataset = get_noisy_dataset(train_dataset, noise_type="salt_pepper", noise_level=0.1)
+noisy_test_dataset = get_noisy_dataset(test_dataset, noise_type="salt_pepper", noise_level=0.1)
 
 # new DataLoader
-noise_train_loader = DataLoader(noisy_train_dataset, batch_size=256, shuffle=True, num_workers=4)
-noise_test_loader = DataLoader(noisy_test_dataset, batch_size=256, shuffle=False, num_workers=4)
+noise_train_loader = DataLoader(noisy_train_dataset, batch_size=512, shuffle=True, num_workers=4)
+noise_test_loader = DataLoader(noisy_test_dataset, batch_size=512, shuffle=False, num_workers=4)
 
 
 # reprogram model
 import torchvision.models as models
 import torch
 
-backbone = models.resnet18(pretrained=True)
-backbone.fc = torch.nn.Identity()
+# backbone = models.resnet18(pretrained=True)
+# backbone.fc = torch.nn.Identity()
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)  # 应该输出 cuda:0
 
+base_model,image_size = get_model("vit_b_16", pretrained=True)
+base_model = base_model.to(device)
 reprogram_model(
  train_dataset=noisy_train_dataset,
     test_dataset=noisy_test_dataset,
-    base_model=backbone.to(device),
+    base_model=base_model.to(device),
 )
