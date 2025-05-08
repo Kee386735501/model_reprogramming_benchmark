@@ -1,4 +1,5 @@
 
+
 import torch.nn as nn
 import torch
 
@@ -21,24 +22,34 @@ from torch.utils.data import Subset, DataLoader
 
 
 # linear probe method
-def linear_probe(train_dataset, test_dataset, base_model):
+def linear_probe(train_dataset, test_dataset, base_model,model_name="resnet18"):
     args = Args()
     device = args.device
     # 冻结参数
     for parameter in base_model.parameters():
         parameter.requires_grad = False
     # 线性分类器(resnet or vit)
-    if hasattr(base_model,"fc"):
-        feature_dim = base_model.fc.in_features
-        base_model.fc = nn.Linear(feature_dim, args.num_classes)
-    elif hasattr(base_model,"head"):
-        feature_dim = base_model.heads.head.in_features
-        base_model.heads = nn.Linear(feature_dim, args.num_classes)
+    # if hasattr(base_model,"fc"):
+    #     feature_dim = base_model.fc.out_features
+    #     # base_model.fc = nn.Linear(feature_dim, args.num_classes)
+    # elif hasattr(base_model,"head"):
+    #     feature_dim = base_model.heads.head.out_features
+    #     # base_model.heads = nn.Linear(feature_dim, args.num_classes)
+    if model_name == "resnet18":
+        feature_dim = base_model.fc.out_features
+
+    elif model_name == "vit_b_16":
+        feature_dim = base_model.heads[0].out_features
     else:
         raise ValueError("Model does not have a linear layer to replace")
+    
     base_model = base_model.to(device)
+
+    # 线性探测头 
+    probe_head = nn.Linear(feature_dim, args.num_classes).to(device)
+
     # 优化器 & 损失函数
-    optimizer = torch.optim.Adam(base_model.parameters(), lr=args.lr)
+    optimizer = torch.optim.Adam(probe_head.parameters(), lr=args.lr)
     criterion = nn.CrossEntropyLoss()
 
     # 数据加载器
@@ -58,46 +69,58 @@ def linear_probe(train_dataset, test_dataset, base_model):
 
         for x, y in tqdm(train_loader, desc=f"Epoch {epoch+1}/{args.epochs}"):
             x, y = x.to(device), y.to(device)
-            optimizer.zero_grad()
-            logits = base_model(x)
+            # 前向：冻结模型无梯度推断
+            with torch.no_grad():
+                base_logits = base_model(x)
+                if base_logits.ndim > 2:
+                    base_logits = torch.flatten(base_logits, 1)
+
+            logits = probe_head(base_logits)
             loss = criterion(logits, y)
+
+            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
             train_loss += loss.item() * x.size(0)
-            preds = torch.argmax(logits, dim=1)
-            correct += (preds == y).sum().item()
+            pred = logits.argmax(dim=1)
+            correct += (pred == y).sum().item()
             total += y.size(0)
 
         train_acc = correct / total
         writer.add_scalar("train/loss", train_loss / total, epoch)
         writer.add_scalar("train/acc", train_acc, epoch)
 
-        # 验证
-        base_model.eval()
-        correct = 0
-        total = 0
-        test_loss = 0.0
+        # ---- 测试阶段 ---- #
+        probe_head.eval()
+        test_loss, correct, total = 0.0, 0, 0
         with torch.no_grad():
             for x, y in test_loader:
-                x, y = x.to(device), y.to(device)
-                logits = base_model(x)
+                x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
+                base_logits = base_model(x)
+                if base_logits.ndim > 2:
+                    base_logits = torch.flatten(base_logits, 1)
+                logits = probe_head(base_logits)
+
                 loss = criterion(logits, y)
                 test_loss += loss.item() * x.size(0)
-                preds = torch.argmax(logits, dim=1)
-                correct += (preds == y).sum().item()
+                pred = logits.argmax(dim=1)
+                correct += (pred == y).sum().item()
                 total += y.size(0)
 
         test_acc = correct / total
         writer.add_scalar("test/loss", test_loss / total, epoch)
         writer.add_scalar("test/acc", test_acc, epoch)
 
-        print(f"Epoch {epoch+1} | Train Acc: {train_acc:.4f} | Test Acc: {test_acc:.4f}")
+        print(f"Epoch {epoch+1:>3} | "
+              f"train acc {train_acc:.4f}, loss {train_loss/total:.4f} | "
+              f"test acc {test_acc:.4f},  loss {test_loss/total:.4f}")
 
         best_acc = max(best_acc, test_acc)
 
-    print(f"Best Test Accuracy: {best_acc:.4f}")
+    print(f"✅ Best test accuracy: {best_acc:.4f}")
     writer.close()
+    return best_acc
 
 
 
@@ -255,6 +278,7 @@ def get_dist_matrix(fx, y):
     dist_matrix = torch.cat(dist_matrix, dim=1)
     return dist_matrix
 
+
 def predictive_distribution_based_multi_label_mapping(dist_matrix, mlm_num: int):
     assert mlm_num * dist_matrix.size(1) <= dist_matrix.size(0), "source label number not enough for mapping"
     mapping_matrix = torch.zeros_like(dist_matrix, dtype=int)
@@ -303,6 +327,7 @@ def label_mapping_base(logits, mapping_sequence):
     return modified_logits
 
 
+
 import torch
 
 class Args:
@@ -341,9 +366,6 @@ def reprogram_model(train_dataset,test_dataset,base_model):
     args = Args()
     device = args.device
     if args.model == "ViT_B32":
-        args.imgsize = 384
-        
-
         args.imgsize = 224
     model = base_model
     # load the dataset 
@@ -548,7 +570,7 @@ def get_noisy_dataset(base_dataset: Dataset, noise_type: str = "gaussian", noise
     return FastNoisyDataset(base_dataset, noise_type=noise_type, noise_level=noise_level)
 
 
-def get_model(name: str, pretrained: bool = True):
+def get_model(name: str, pretrained: bool = True,image_size = 224):
     if name == "resnet18":
         model = models.resnet18(pretrained=pretrained)
         # model.fc = nn.Identity()  # 去掉最后的全连接层
@@ -560,7 +582,120 @@ def get_model(name: str, pretrained: bool = True):
         image_size = 224
     else:
         raise ValueError(f"Unsupported model: {name}")
-    return model, image_size
+    return model
+
+
+import torch.optim as optim
+# fully finetune the pretrained model 
+def fully_finetune(train_dataset,test_dataset,base_model):
+    args = Args()
+    device = args.device
+    # 更换分类头
+    if hasattr(base_model,"fc"):
+        feature_dim = base_model.fc.in_features
+        base_model.fc = nn.Linear(feature_dim, args.num_classes).to(device)
+    elif hasattr(base_model,"head"):
+        feature_dim = base_model.heads.head.in_features
+        base_model.heads = nn.Linear(feature_dim, args.num_classes).to(device)
+
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    args = Args()
+    device = args.device
+    # Load ResNet18
+    # model = models.resnet18(pretrained=args.whether_pretrained)
+    # model.fc = nn.Linear(model.fc.in_features, num_classes)
+    # model = model.to(device)
+
+    # load the weights
+    # if pretrained_path is not None:
+    #     state_dict = torch.load(pretrained_path, map_location=device)
+    #     model.load_state_dict(state_dict)
+    #     print(f"Loaded pretrained weights from {pretrained_path}")
+
+
+    # Loss and optimizers
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(base_model.parameters(), lr=args.lr)
+
+    # DataLoaders
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+    
+    #Tensorboard Write in 
+    # writer = SummaryWriter(log_dir=log_dir)
+
+    # Training loops
+    for epoch in range(args.epochs):
+        base_model.train()
+        running_loss = 0.0
+        correct = 0
+        total = 0
+        for images,labels in tqdm(train_loader, desc=f"Epoch {epoch+1}/{args.epochs}", unit="batch"):
+        # for images, labels in train_loader:
+            images, labels = images.to(device), labels.to(device)
+
+            optimizer.zero_grad()
+            outputs = base_model(images)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item() * images.size(0)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+        train_accuracy = 100 * correct / total
+
+
+        base_model.eval()
+        test_loss = 0.0
+        test_correct = 0
+        test_total = 0   
+        with torch.no_grad():
+            for images, labels in test_loader:
+                images, labels = images.to(device), labels.to(device)
+                outputs = base_model(images)
+                loss = criterion(outputs, labels)
+                test_loss += loss.item() * images.size(0)
+                _, predicted = torch.max(outputs.data, 1)
+                test_total += labels.size(0)
+                test_correct += (predicted == labels).sum().item()
+        test_accuracy = 100 * test_correct / test_total
+        # Log the loss and accuracy
+        # writer.add_scalar('Loss/test', test_loss/test_total, epoch)
+        # writer.add_scalar('Accuracy/test', test_accuracy, epoch)
+        # Log the training loss and accuracy    
+        # writer.add_scalar('Loss/train', running_loss/total, epoch)
+        # writer.add_scalar('Accuracy/train', train_accuracy, epoch)
+        
+        
+        print(f"Epoch [{epoch+1}/{args.epochs}], Loss: {running_loss/total:.4f}, Train Accuracy: {train_accuracy:.2f}%, Test Loss: {test_loss/test_total:.4f}, Test Accuracy: {test_accuracy:.2f}%")
+    # if args.whether_save and save_name!= None:
+    #     torch.save(model.state_dict(), save_name)
+    #     print(f"Model saved as {save_name}")
+    return base_model        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # prepare dataset 
 
@@ -568,12 +703,12 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 from torch.utils.data import DataLoader
 
-transform = transforms.Compose([
-    transforms.Resize(224),  # 适配 ResNet18 预训练的输入
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406],  # ImageNet 的 mean 和 std
-                         std=[0.229, 0.224, 0.225]),
-])
+# transform = transforms.Compose([
+#     transforms.Resize(224),  # 适配 ResNet18 预训练的输入
+#     transforms.ToTensor(),
+#     transforms.Normalize(mean=[0.485, 0.456, 0.406],  # ImageNet 的 mean 和 std
+#                          std=[0.229, 0.224, 0.225]),
+# ])
 
 
 # svhn_test_dataset = SVHN(root='./data', split='test', download=True, transform=transform)
@@ -593,12 +728,12 @@ transform = transforms.Compose([
 
 train_dataset,test_dataset,num_classes = get_dataset(name="cifar100", root="./data", image_size=224, download=True)
 # add noise to dataset
-noisy_train_dataset = get_noisy_dataset(train_dataset, noise_type="salt_pepper", noise_level=0.1)
-noisy_test_dataset = get_noisy_dataset(test_dataset, noise_type="salt_pepper", noise_level=0.1)
+# noisy_train_dataset = get_noisy_dataset(train_dataset, noise_type="salt_pepper", noise_level=0.1)
+# noisy_test_dataset = get_noisy_dataset(test_dataset, noise_type="salt_pepper", noise_level=0.1)
 
-# new DataLoader
-noise_train_loader = DataLoader(noisy_train_dataset, batch_size=512, shuffle=True, num_workers=4)
-noise_test_loader = DataLoader(noisy_test_dataset, batch_size=512, shuffle=False, num_workers=4)
+# # new DataLoader
+# noise_train_loader = DataLoader(noisy_train_dataset, batch_size=512, shuffle=True, num_workers=4)
+# noise_test_loader = DataLoader(noisy_test_dataset, batch_size=512, shuffle=False, num_workers=4)
 
 
 # reprogram model
@@ -607,14 +742,49 @@ import torch
 
 # backbone = models.resnet18(pretrained=True)
 # backbone.fc = torch.nn.Identity()
-
+image_size = 224
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)  # 应该输出 cuda:0
 
-base_model,image_size = get_model("vit_b_16", pretrained=True)
-base_model = base_model.to(device)
-reprogram_model(
- train_dataset=noisy_train_dataset,
-    test_dataset=noisy_test_dataset,
-    base_model=base_model.to(device),
-)
+# base_model = get_model("resnet18", pretrained=True)
+# base_model = base_model.to(device)
+# reprogram_model(
+#  train_dataset=noisy_train_dataset,
+#     test_dataset=noisy_test_dataset,
+#     base_model=base_model.to(device),
+# )
+
+fractions = [0.2, 0.4, 0.6, 0.8, 1.0]
+fractions = [0.2, 0.4, 0.6, 0.8, 1.0]
+# frac = fractions[0]
+# print(f"\n=== Training with {int(frac *100)}% of CIFAR-10 ===")
+# 获取部分训练集
+# partial_train_dataset = get_partial_dataset(train_dataset, fraction=frac)
+
+# 选择不同方法训练
+# 方法一：model reprogramming
+# print("===> Method: Model Reprogramming")
+# base_model = get_model("resnet18", pretrained=True).to(device)
+# reprogram_model(partial_train_dataset, test_dataset, base_model)
+
+# 方法二：Linear Probe
+for i in range(len(fractions)):
+    frac = fractions[i]
+    partial_train_dataset = get_partial_dataset(train_dataset, fraction=frac)
+    print(f"\n=== Training with {int(frac*100)}% of CIFAR-100 ===")
+    # 获取部分训练集
+    partial_train_dataset = get_partial_dataset(train_dataset, fraction=frac)
+    # 选择不同方法训练
+    # 方法一：model reprogramming
+    # print("===> Method: Model Reprogramming")
+    # base_model = get_model("resnet18", pretrained=True).to(device)
+    # reprogram_model(partial_train_dataset, test_dataset, base_model)
+    print("===> Method: Linear Probe")
+    base_model = get_model("vit_b_16", pretrained=True).to(device)
+    fully_finetune(partial_train_dataset, test_dataset, base_model)
+
+# 方法三：Fine-tuning
+# print("===> Method: Fine-tuning")
+# base_model = get_model("resnet18", pretrained=True).to(device)
+# base_model.fc = torch.nn.Linear(base_model.fc.in_features, num_classes).to(device)
+# finetune_resnet_model(partial_train_dataset, test_dataset, base_model)
