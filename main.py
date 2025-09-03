@@ -609,10 +609,52 @@ args = Config([
 "--vp_mode", "instance",
 "--model_name", "resnet18",
 "--mapping_mode", "blm",
-"--dataset", "cifar10",
+"--dataset", "cifar100",
 "--input_dim","1000",
-"--output_dim","10",
+"--output_dim","100",
 "--train_percent", "80",   # ← 只用 40% 训练集
+"--seed", "42"
+]).get()
+run_experiments(args)
+# print(args)
+
+from config import Config
+args = Config([
+"--vp_mode", "instance",
+"--model_name", "resnet18",
+"--mapping_mode", "blm",
+"--dataset", "cifar100",
+"--input_dim","1000",
+"--output_dim","100",
+"--train_percent", "80",   # ← 只用 40% 训练集
+"--seed", "42"
+]).get()
+run_experiments(args)
+# print(args)
+
+from config import Config
+args = Config([
+"--vp_mode", "instance",
+"--model_name", "resnet18",
+"--mapping_mode", "blm",
+"--dataset", "cifar100",
+"--input_dim","1000",
+"--output_dim","100",
+"--train_percent", "60",   # ← 只用 40% 训练集
+"--seed", "42"
+]).get()
+run_experiments(args)
+# print(args)
+
+from config import Config
+args = Config([
+"--vp_mode", "instance",
+"--model_name", "resnet18",
+"--mapping_mode", "blm",
+"--dataset", "cifar100",
+"--input_dim","1000",
+"--output_dim","100",
+"--train_percent", "40",   # ← 只用 40% 训练集
 "--seed", "42"
 ]).get()
 run_experiments(args)
