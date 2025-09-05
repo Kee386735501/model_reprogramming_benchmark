@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/compute_domain_matrix.py", line 223, in <module>
+    main(args)
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/compute_domain_matrix.py", line 173, in main
+    mean_vals = compute_pair_mean(
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/compute_domain_matrix.py", line 86, in compute_pair_mean
+    classes = _classes_intersection(pathA, pathB)
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/compute_domain_matrix.py", line 52, in _classes_intersection
+    subA = set(dd._list_immediate_subdirs(path_a))
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/dataset_distance.py", line 86, in _list_immediate_subdirs
+    return sorted([d.name for d in os.scandir(root) if d.is_dir()])
+FileNotFoundError: [Errno 2] No such file or directory: './data/clipart'
+srun: error: spartan-gpgpu127: task 0: Exited with exit code 1

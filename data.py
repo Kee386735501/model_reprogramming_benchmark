@@ -110,6 +110,7 @@ def prepare_additive_data(dataset, data_path, preprocess, test_process=None,
                           batch_size=1024, shuffle=True,
                           train_percent=100, seed=42):    # ← 新增参数
     data_path = os.path.join(data_path, dataset)
+    pin_memory = torch.cuda.is_available()
     if not test_process:
         test_process = preprocess
     if dataset == "cifar10":
@@ -118,8 +119,8 @@ def prepare_additive_data(dataset, data_path, preprocess, test_process=None,
         test_data = datasets.CIFAR10(root = data_path, train = False, download = True, transform = test_process)
         class_names = refine_classnames(test_data.classes)
         loaders = {
-            'train': DataLoader(train_data, batch_size, shuffle = shuffle, num_workers=1),
-            'test': DataLoader(test_data, batch_size, shuffle = False, num_workers=1),
+            'train': DataLoader(train_data, batch_size, shuffle = shuffle, num_workers=8,pin_memory=pin_memory),
+            'test': DataLoader(test_data, batch_size, shuffle = False, num_workers=8,pin_memory=pin_memory),
         }     
     elif dataset == "cifar100":
         train_data = datasets.CIFAR100(root = data_path, train = True, download = True, transform = preprocess)
@@ -127,8 +128,8 @@ def prepare_additive_data(dataset, data_path, preprocess, test_process=None,
         test_data = datasets.CIFAR100(root = data_path, train = False, download = True, transform = test_process)
         class_names = refine_classnames(test_data.classes)
         loaders = {
-            'train': DataLoader(train_data, batch_size, shuffle = shuffle, num_workers=1),
-            'test': DataLoader(test_data, batch_size, shuffle = False, num_workers=1),
+            'train': DataLoader(train_data, batch_size, shuffle = shuffle, num_workers=8,pin_memory=pin_memory),
+            'test': DataLoader(test_data, batch_size, shuffle = False, num_workers=8,pin_memory=pin_memory),
         }
     elif dataset == "svhn":
         train_data = datasets.SVHN(root = data_path, split="train", download = True, transform = preprocess)
@@ -136,8 +137,8 @@ def prepare_additive_data(dataset, data_path, preprocess, test_process=None,
         test_data = datasets.SVHN(root = data_path, split="test", download = True, transform = test_process)
         class_names = [f'{i}' for i in range(10)]
         loaders = {
-            'train': DataLoader(train_data, batch_size, shuffle = shuffle, num_workers=1),
-            'test': DataLoader(test_data, batch_size, shuffle = False, num_workers=1),
+            'train': DataLoader(train_data, batch_size, shuffle = shuffle, num_workers=8,pin_memory=pin_memory),
+            'test': DataLoader(test_data, batch_size, shuffle = False, num_workers=8,pin_memory=pin_memory),
         }
     elif dataset == "gtsrb":
         train_data = datasets.GTSRB(root = data_path, split="train", download = True, transform = preprocess)
@@ -145,8 +146,8 @@ def prepare_additive_data(dataset, data_path, preprocess, test_process=None,
         test_data = datasets.GTSRB(root = data_path, split="test", download = True, transform = test_process)
         class_names = refine_classnames(list(GTSRB_LABEL_MAP.values()))
         loaders = {
-            'train': DataLoader(train_data, batch_size, shuffle = shuffle, num_workers=1),
-            'test': DataLoader(test_data, batch_size, shuffle = False, num_workers=1),
+            'train': DataLoader(train_data, batch_size, shuffle = shuffle, num_workers=8,pin_memory=pin_memory),
+            'test': DataLoader(test_data, batch_size, shuffle = False, num_workers=8,pin_memory=pin_memory),
         }
     else:
         raise NotImplementedError(f"{dataset} not supported")

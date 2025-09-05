@@ -1,0 +1,63 @@
+Tue Sep  2 00:40:07 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.144.03             Driver Version: 550.144.03     CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100 80GB PCIe          On  |   00000000:17:00.0 Off |                    0 |
+| N/A   31C    P0             52W /  300W |       1MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+[DEV] base device: cuda | cuda=True | mps=False
+---- watermark + BLM ----
+[DEV] args.device = cuda
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Watermarking: size=224, pad=30
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: watermark
+[Mapping] Enabled: blm+
+[Fixed Mapping + VP] Best Test Acc = 67.17%
+---- watermark + BLM ----
+[DEV] args.device = cuda
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Watermarking: size=224, pad=30
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: watermark
+[Mapping] Enabled: blm
+[Fixed Mapping + VP] Best Test Acc = 69.96%
+[DEV] args.device = cuda
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Watermarking: size=224, pad=30
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: watermark
+[Mapping] Enabled: blm
+[Fixed Mapping + VP] Best Test Acc = 69.29%
+[DEV] args.device = cuda
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Watermarking: size=224, pad=30
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: watermark
+[Mapping] Enabled: blm
+[Fixed Mapping + VP] Best Test Acc = 70.08%
+[DEV] args.device = cuda
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Watermarking: size=224, pad=30
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: watermark
+[Mapping] Enabled: blm
+[Fixed Mapping + VP] Best Test Acc = 69.15%

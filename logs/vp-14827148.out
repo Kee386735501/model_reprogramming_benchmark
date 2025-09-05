@@ -1,0 +1,61 @@
+Wed Aug 27 10:14:55 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.144.03             Driver Version: 550.144.03     CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100 80GB PCIe          On  |   00000000:E3:00.0 Off |                    0 |
+| N/A   32C    P0             52W /  300W |       1MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm
+[Fixed Mapping + VP] Best Test Acc = 37.95%
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+
+[Fixed Mapping + VP] Best Test Acc = 38.94%
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+
+[Fixed Mapping + VP] Best Test Acc = 39.06%
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+
+[Fixed Mapping + VP] Best Test Acc = 37.86%
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+
+[Fixed Mapping + VP] Best Test Acc = 38.09%
+Files already downloaded and verified
+Files already downloaded and verified
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+

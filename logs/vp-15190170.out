@@ -1,0 +1,42 @@
+Wed Sep  3 21:11:09 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.144.03             Driver Version: 550.144.03     CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100 80GB PCIe          On  |   00000000:17:00.0 Off |                    0 |
+| N/A   28C    P0             54W /  300W |       1MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+[Pair] clipart vs infograph
+[Pair] clipart vs painting
+[Pair] clipart vs quickdraw
+[Pair] clipart vs real
+[Pair] clipart vs sketch
+[Pair] infograph vs painting
+[Pair] infograph vs quickdraw
+[Pair] infograph vs real
+[Pair] infograph vs sketch
+[Pair] painting vs quickdraw
+[Pair] painting vs real
+[Pair] painting vs sketch
+[Pair] quickdraw vs real
+[Pair] quickdraw vs sketch
+[Pair] real vs sketch
+[Saved] /data/gpfs/projects/punim1943/xunli/mr_benchmark/outputs/domainnet_matrix_FID.csv
+[Saved] /data/gpfs/projects/punim1943/xunli/mr_benchmark/outputs/domainnet_matrix_KID_mean.csv
+[Saved] /data/gpfs/projects/punim1943/xunli/mr_benchmark/outputs/domainnet_matrix_KID_std.csv
+[Saved] /data/gpfs/projects/punim1943/xunli/mr_benchmark/outputs/domainnet_matrix_MMD_RBF.csv
+[Saved] /data/gpfs/projects/punim1943/xunli/mr_benchmark/outputs/domainnet_matrix_Sliced_Wasserstein.csv
+[Saved] /data/gpfs/projects/punim1943/xunli/mr_benchmark/outputs/domainnet_matrix_KL_Gauss.csv
+[Saved] /data/gpfs/projects/punim1943/xunli/mr_benchmark/outputs/domainnet_matrices.json

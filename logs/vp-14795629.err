@@ -1,0 +1,19 @@
+Error processing line 1 of /home/xunli/.local/lib/python3.10/site-packages/vision-1.0.0-py3.10-nspkg.pth:
+
+  Traceback (most recent call last):
+    File "/apps/easybuild-2022/easybuild/software/Compiler/GCCcore/11.3.0/Python/3.10.4/lib/python3.10/site.py", line 186, in addpackage
+      exec(line)
+    File "<string>", line 1, in <module>
+    File "<frozen importlib._bootstrap>", line 568, in module_from_spec
+  AttributeError: 'NoneType' object has no attribute 'loader'
+
+Remainder of file ignored
+Traceback (most recent call last):
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/main.py", line 4, in <module>
+    import torchvision.transforms as transforms
+  File "/home/xunli/.local/lib/python3.10/site-packages/torchvision/__init__.py", line 10, in <module>
+    from torchvision import _meta_registrations, datasets, io, models, ops, transforms, utils  # usort:skip
+  File "/home/xunli/.local/lib/python3.10/site-packages/torchvision/_meta_registrations.py", line 163, in <module>
+    @torch.library.register_fake("torchvision::nms")
+AttributeError: module 'torch.library' has no attribute 'register_fake'
+srun: error: spartan-gpgpu108: task 0: Exited with exit code 1

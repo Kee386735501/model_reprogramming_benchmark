@@ -1,0 +1,782 @@
+Wed Aug 27 23:27:32 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.144.03             Driver Version: 550.144.03     CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100 80GB PCIe          On  |   00000000:17:00.0 Off |                    0 |
+| N/A   37C    P0             52W /  300W |       1MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+Files already downloaded and verified
+Files already downloaded and verified
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+
+[CHK] visual_prompt device: cuda:0
+[CHK] network device: cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[Fixed Mapping + VP] Best Test Acc = 37.26%
+Downloading http://ufldl.stanford.edu/housenumbers/train_32x32.mat to ./data/svhn/train_32x32.mat
+Downloading http://ufldl.stanford.edu/housenumbers/test_32x32.mat to ./data/svhn/test_32x32.mat
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+
+[CHK] visual_prompt device: cuda:0
+[CHK] network device: cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[Fixed Mapping + VP] Best Test Acc = 61.99%
+Using downloaded and verified file: ./data/svhn/train_32x32.mat
+Using downloaded and verified file: ./data/svhn/test_32x32.mat
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+
+[CHK] visual_prompt device: cuda:0
+[CHK] network device: cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[Fixed Mapping + VP] Best Test Acc = 61.68%
+Using downloaded and verified file: ./data/svhn/train_32x32.mat
+Using downloaded and verified file: ./data/svhn/test_32x32.mat
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+
+[CHK] visual_prompt device: cuda:0
+[CHK] network device: cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[Fixed Mapping + VP] Best Test Acc = 61.38%
+Using downloaded and verified file: ./data/svhn/train_32x32.mat
+Using downloaded and verified file: ./data/svhn/test_32x32.mat
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+
+[CHK] visual_prompt device: cuda:0
+[CHK] network device: cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[Fixed Mapping + VP] Best Test Acc = 54.34%
+Using downloaded and verified file: ./data/svhn/train_32x32.mat
+Using downloaded and verified file: ./data/svhn/test_32x32.mat
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[VP] Instancewise: size=224, layers=5, patch=8, ch=3
+[Mapping] Enabled,model reprogramming starting
+[Visual Prompt] Mode: instance
+[Mapping] Enabled: blm+
+[CHK] visual_prompt device: cuda:0
+[CHK] network device: cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[CHK] batch x BEFORE .to(): cpu
+[CHK] batch x AFTER  .to(): cuda:0
+[Fixed Mapping + VP] Best Test Acc = 50.97%
+Files already downloaded and verified
+Files already downloaded and verified
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[Visual Prompt] Disabled
+[Mapping] Disabled
+[Linear Training] Completed
+[Linear Probe] Final Eval Acc: 56.95% (should ≈ best_acc)
+Files already downloaded and verified
+Files already downloaded and verified
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[Visual Prompt] Disabled
+[Mapping] Disabled
+[Linear Training] Completed
+[Linear Probe] Final Eval Acc: 56.57% (should ≈ best_acc)
+Files already downloaded and verified
+Files already downloaded and verified
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[Visual Prompt] Disabled
+[Mapping] Disabled
+[Linear Training] Completed
+[Linear Probe] Final Eval Acc: 55.45% (should ≈ best_acc)
+Files already downloaded and verified
+Files already downloaded and verified
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[Visual Prompt] Disabled
+[Mapping] Disabled
+[Linear Training] Completed
+[Linear Probe] Final Eval Acc: 53.47% (should ≈ best_acc)
+Files already downloaded and verified
+Files already downloaded and verified
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[Visual Prompt] Disabled
+[Mapping] Disabled
+[Linear Training] Completed
+[Linear Probe] Final Eval Acc: 50.63% (should ≈ best_acc)
+Using downloaded and verified file: ./data/svhn/train_32x32.mat
+Using downloaded and verified file: ./data/svhn/test_32x32.mat
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[Visual Prompt] Disabled
+[Mapping] Disabled
+[Linear Training] Completed
+[Linear Probe] Final Eval Acc: 44.40% (should ≈ best_acc)
+Using downloaded and verified file: ./data/svhn/train_32x32.mat
+Using downloaded and verified file: ./data/svhn/test_32x32.mat
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[Visual Prompt] Disabled
+[Mapping] Disabled
+[Linear Training] Completed
+[Linear Probe] Final Eval Acc: 44.42% (should ≈ best_acc)
+Using downloaded and verified file: ./data/svhn/train_32x32.mat
+Using downloaded and verified file: ./data/svhn/test_32x32.mat
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[Visual Prompt] Disabled
+[Mapping] Disabled
+[Linear Training] Completed
+[Linear Probe] Final Eval Acc: 44.16% (should ≈ best_acc)
+Using downloaded and verified file: ./data/svhn/train_32x32.mat
+Using downloaded and verified file: ./data/svhn/test_32x32.mat
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[Visual Prompt] Disabled
+[Mapping] Disabled
+[Linear Training] Completed
+[Linear Probe] Final Eval Acc: 43.89% (should ≈ best_acc)
+Using downloaded and verified file: ./data/svhn/train_32x32.mat
+Using downloaded and verified file: ./data/svhn/test_32x32.mat
+[CHK] torch.cuda.is_available(): True | args.device: cuda
+[CHK] cuda.count: 1 | name: NVIDIA A100 80GB PCIe
+[CHK] blackbox_model device: cuda:0
+[Visual Prompt] Disabled
+[Mapping] Disabled
+[Linear Training] Completed
+[Linear Probe] Final Eval Acc: 42.55% (should ≈ best_acc)

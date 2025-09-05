@@ -8,7 +8,6 @@ from torch.utils.data import DataLoader,random_split
 from tqdm import tqdm
 from vp import build_visual_prompt,DummyVisualPrompt  
 from mapping import one2one_mappnig_matrix, blm_reweight_matrix, blmp_reweight_matrix
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 import copy 
 from data import get_train_preprocess, IMAGENETNORMALIZE, prepare_additive_data
 from config import Config
@@ -16,18 +15,31 @@ from torch.cuda.amp import GradScaler
 import os
 from contextlib import nullcontext
 
-use_cuda = torch.cuda.is_available() and ("cuda" in str(device))
+
+# 支持 CUDA 和 MPS，并在都不可用时回退 CPU
+def pick_device():
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
+
+DEFAULT_DEVICE = pick_device()
+print(f"[DEV] base device: {DEFAULT_DEVICE} | cuda={torch.cuda.is_available()} | "
+      f"mps={getattr(torch.backends, 'mps', None) and torch.backends.mps.is_available()}")
+
 
 # 获取 AMP 上下文    
 def get_amp_ctx(device):
-    use_cuda = torch.cuda.is_available() and ("cuda" in str(device))
-    if use_cuda:
+    if device.type == "cuda" and torch.cuda.is_available():
         try:
-            return torch.amp.autocast("cuda")     # PyTorch 2.x
-        except AttributeError:
-            return torch.cuda.amp.autocast()      # 兼容 1.x
+            return torch.amp.autocast(device_type="cuda")  # PyTorch 2.x
+        except TypeError:
+            return torch.cuda.amp.autocast()               # 兼容旧版本
     else:
         return nullcontext()
+
+
 
 # ===== Process Input =====
 def process_input(args):
@@ -221,7 +233,7 @@ def train_visual_prompt_with_mapping(
     assert class_names is not None and len(class_names) > 0, "必须提供目标类名列表以确定目标类别数"
 
     target_num_classes = len(class_names)
-    scaler = GradScaler()
+    scaler = GradScaler() if (device.type == "cuda" and torch.cuda.is_available()) else None
 
     # 冻结 backbone 参数 & 固定 BN/Dropout
     network.requires_grad_(False)
@@ -254,7 +266,11 @@ def train_visual_prompt_with_mapping(
                     desc=f"Training Epo {epoch}", ncols=100)
 
         for step, (x, y) in enumerate(pbar):
-            x, y = x.to(device), y.to(device)
+            if device.type == "cuda":
+                x = x.to(device, non_blocking=True); y = y.to(device, non_blocking=True)
+            else:
+                x = x.to(device); y = y.to(device)
+
             optimizer.zero_grad(set_to_none=True)
 
             with get_amp_ctx(device):
@@ -264,9 +280,14 @@ def train_visual_prompt_with_mapping(
                 fx = probs_p @ mapping_matrix                          # [B, C]
                 loss = F.cross_entropy(fx, y, reduction='mean')
 
-            scaler.scale(loss).backward()
-            scaler.step(optimizer)
-            scaler.update()
+            if scaler is not None:
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                optimizer.step()
+
 
             # 统计
             bs = y.size(0)
@@ -290,8 +311,12 @@ def train_visual_prompt_with_mapping(
 
         with torch.no_grad():
             for x, y in pbar:
-                x = x.to(device, non_blocking=True)
-                y = y.to(device, non_blocking=True)
+                if device.type == "cuda":
+                    x = x.to(device, non_blocking=True); y = y.to(device, non_blocking=True)
+                else:
+                    x = x.to(device); y = y.to(device)
+                # x = x.to(device, non_blocking=True)
+                # y = y.to(device, non_blocking=True)
                 logits_p = network(visual_prompt(x))                   # [B, P]
                 probs_p = torch.softmax(logits_p / temp, dim=1)        # [B, P]
                 fx = probs_p @ mapping_matrix                          # [B, C]
@@ -336,18 +361,21 @@ class TrainableLinearClassifier(nn.Module):
 
 
 # ===== Evaluation =====
-def evaluate(model, loader):
+def evaluate(model, loader, device):
     model.eval()
     correct, total = 0, 0
     with torch.no_grad():
         for x, y in loader:
-            x, y = x.to(device), y.to(device)
+            if device.type == "cuda":
+                x = x.to(device, non_blocking=True); y = y.to(device, non_blocking=True)
+            else:
+                x = x.to(device); y = y.to(device)
             logits = model(x)
             preds = torch.argmax(logits, dim=1)
             correct += (preds == y).sum().item()
             total += y.size(0)
-    acc = correct / total
-    return acc
+    return correct / total
+
 
 
 # ===== 训练并评估线性探测层 =====
@@ -390,9 +418,10 @@ def train_linear_probe(
     # --- AMP 兼容（与 mapping 的 GradScaler 对齐） ---
     try:
         from torch.cuda.amp import autocast, GradScaler
-        scaler = GradScaler()
+        scaler = GradScaler() if (hasattr(device, "type") and device.type == "cuda" and torch.cuda.is_available()) else None
         def _amp_ctx():
-            return autocast(enabled=("cuda" in str(device) and torch.cuda.is_available()))
+            return autocast(enabled=(hasattr(device, "type") and device.type == "cuda" and torch.cuda.is_available()))
+
     except Exception:
         import contextlib
         scaler = None
@@ -413,7 +442,11 @@ def train_linear_probe(
                     desc=f"Training Epo {epoch}", ncols=100)
 
         for step, (x, y) in enumerate(pbar):
-            x, y = x.to(device), y.to(device)
+            if device.type == "cuda":
+                x = x.to(device, non_blocking=True); y = y.to(device, non_blocking=True)
+            else:
+                x = x.to(device); y = y.to(device)
+
             if optimizer is not None:
                 optimizer.zero_grad(set_to_none=True)
 
@@ -453,7 +486,11 @@ def train_linear_probe(
                     desc=f"Testing Epo {epoch}", ncols=100)
         with torch.no_grad():
             for x, y in pbar:
-                x, y = x.to(device), y.to(device)
+                if device.type == "cuda":
+                    x = x.to(device, non_blocking=True); y = y.to(device, non_blocking=True)
+                else:
+                    x = x.to(device); y = y.to(device)
+
                 logits = model(x)
                 total_num += y.size(0)
                 true_num += (logits.argmax(1) == y).float().sum().item()
@@ -486,7 +523,10 @@ def evaluate_linear(model, loader, device):
     correct = total = 0
     with torch.no_grad():
         for x, y in loader:
-            x, y = x.to(device), y.to(device)
+            if device.type == "cuda":
+                x = x.to(device, non_blocking=True); y = y.to(device, non_blocking=True)
+            else:
+                x = x.to(device); y = y.to(device)
             logits = model(x)
             pred = logits.argmax(1)
             correct += (pred == y).sum().item()
@@ -499,6 +539,18 @@ def evaluate_linear(model, loader, device):
 
 # ===== Run Experiments =====
 def run_experiments(args):
+    # —— 设备兜底：优先 CUDA→MPS→CPU
+    base = DEFAULT_DEVICE
+    req = getattr(args, "device", None)
+    try:
+        ad = torch.device(req) if req else base
+    except Exception:
+        ad = base
+    # 若用户传了与实际不可用设备不一致，回退到 base
+    if ad.type != base.type:
+        ad = base
+    args.device = ad
+    print(f"[DEV] args.device = {args.device}")
     # ==== 数据加载与预处理 ====
     train_loader, test_loader, class_names = process_input(args)
 
@@ -596,66 +648,156 @@ def run_experiments(args):
                 visual_prompt,
                 temp=best_state["temp"],
             ).to(args.device)
-            acc_fixed = evaluate(fixed_model, test_loader)
+            acc_fixed = evaluate(fixed_model, test_loader, args.device)
             print(f"[Fixed Mapping + VP] Best Test Acc = {acc_fixed*100:.2f}%")
         else:
             print("No best_state saved. Check training loop.")
 
 
 
-
+ 
+print("---- watermark + BLM ----")
 from config import Config
+
+# print(args)
+
 args = Config([
-"--vp_mode", "instance",
+"--vp_mode", "watermark",
 "--model_name", "resnet18",
 "--mapping_mode", "blm",
-"--dataset", "cifar100",
+"--dataset", "cifar10",
 "--input_dim","1000",
-"--output_dim","100",
-"--train_percent", "80",   # ← 只用 40% 训练集
+"--output_dim","10",
+"--train_percent", "80",   
 "--seed", "42"
 ]).get()
 run_experiments(args)
 # print(args)
 
-from config import Config
 args = Config([
-"--vp_mode", "instance",
+"--vp_mode", "watermark",
 "--model_name", "resnet18",
 "--mapping_mode", "blm",
-"--dataset", "cifar100",
+"--dataset", "cifar10",
 "--input_dim","1000",
-"--output_dim","100",
-"--train_percent", "80",   # ← 只用 40% 训练集
+"--output_dim","10",
+"--train_percent", "60",   
 "--seed", "42"
 ]).get()
 run_experiments(args)
 # print(args)
 
-from config import Config
 args = Config([
-"--vp_mode", "instance",
+"--vp_mode", "watermark",
 "--model_name", "resnet18",
 "--mapping_mode", "blm",
-"--dataset", "cifar100",
+"--dataset", "cifar10",
 "--input_dim","1000",
-"--output_dim","100",
-"--train_percent", "60",   # ← 只用 40% 训练集
+"--output_dim","10",
+"--train_percent", "40",   
 "--seed", "42"
 ]).get()
 run_experiments(args)
 # print(args)
 
+args = Config([
+"--vp_mode", "watermark",
+"--model_name", "resnet18",
+"--mapping_mode", "blm",
+"--dataset", "cifar10",
+"--input_dim","1000",
+"--output_dim","10",
+"--train_percent", "201",   
+"--seed", "42"
+]).get()
+run_experiments(args)
+# print(args)
+
+
+print("---- watermark + BLM (cifar100) ----")
 from config import Config
 args = Config([
-"--vp_mode", "instance",
+"--vp_mode", "watermark",
 "--model_name", "resnet18",
 "--mapping_mode", "blm",
 "--dataset", "cifar100",
 "--input_dim","1000",
 "--output_dim","100",
-"--train_percent", "40",   # ← 只用 40% 训练集
+"--train_percent", "100",   
 "--seed", "42"
 ]).get()
 run_experiments(args)
 # print(args)
+
+
+args = Config([
+"--vp_mode", "watermark",
+"--model_name", "resnet18",
+"--mapping_mode", "blm",
+"--dataset", "cifar100",
+"--input_dim","1000",
+"--output_dim","100",
+"--train_percent", "80",   
+"--seed", "42"
+]).get()
+run_experiments(args)
+# print(args)
+
+args = Config([
+"--vp_mode", "watermark",
+"--model_name", "resnet18",
+"--mapping_mode", "blm",
+"--dataset", "cifar100",
+"--input_dim","1000",
+"--output_dim","100",
+"--train_percent", "60",   
+"--seed", "42"
+]).get()
+run_experiments(args)
+# print(args)
+
+args = Config([
+"--vp_mode", "watermark",
+"--model_name", "resnet18",
+"--mapping_mode", "blm",
+"--dataset", "cifar100",
+"--input_dim","1000",
+"--output_dim","100",
+"--train_percent", "40",   
+"--seed", "42"
+]).get()
+run_experiments(args)
+# print(args)
+
+args = Config([
+"--vp_mode", "watermark",
+"--model_name", "resnet18",
+"--mapping_mode", "blm",
+"--dataset", "cifar100",
+"--input_dim","1000",
+"--output_dim","100",
+"--train_percent", "20",   
+"--seed", "42"
+]).get()
+run_experiments(args)
+# print(args)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

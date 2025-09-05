@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/compute_domain_matrix.py", line 235, in <module>
+    main(args)
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/compute_domain_matrix.py", line 166, in main
+    domains = [d.strip() for d in args.domains.split(",") if d.strip()]
+AttributeError: 'Args' object has no attribute 'domains'
+srun: error: spartan-gpgpu114: task 0: Exited with exit code 1

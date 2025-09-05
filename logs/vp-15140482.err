@@ -1,0 +1,15 @@
+Downloading: "https://download.pytorch.org/models/inception_v3_google-0cc3c7bd.pth" to /home/xunli/.cache/torch/hub/checkpoints/inception_v3_google-0cc3c7bd.pth
+  0%|          | 0.00/104M [00:00<?, ?B/s] 32%|███▏      | 32.9M/104M [00:00<00:00, 345MB/s] 71%|███████▏  | 74.1M/104M [00:00<00:00, 396MB/s]100%|██████████| 104M/104M [00:00<00:00, 397MB/s] 
+Traceback (most recent call last):
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/compute_domain_matrix.py", line 223, in <module>
+    main(args)
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/compute_domain_matrix.py", line 173, in main
+    mean_vals = compute_pair_mean(
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/compute_domain_matrix.py", line 86, in compute_pair_mean
+    classes = _classes_intersection(pathA, pathB)
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/compute_domain_matrix.py", line 52, in _classes_intersection
+    subA = set(dd._list_immediate_subdirs(path_a))
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/dataset_distance.py", line 86, in _list_immediate_subdirs
+    return sorted([d.name for d in os.scandir(root) if d.is_dir()])
+FileNotFoundError: [Errno 2] No such file or directory: './data/clipart'
+srun: error: spartan-gpgpu109: task 0: Exited with exit code 1

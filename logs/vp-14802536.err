@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/data/gpfs/projects/punim1943/xunli/mr_benchmark/mr_codes/main.py", line 1, in <module>
+    import torch
+  File "/data/gpfs/projects/punim1943/conda/vps/lib/python3.10/site-packages/torch/__init__.py", line 367, in <module>
+    from torch._C import *  # noqa: F403
+ImportError: /data/gpfs/projects/punim1943/conda/vps/lib/python3.10/site-packages/torch/lib/libtorch_cpu.so: undefined symbol: iJIT_NotifyEvent
+srun: error: spartan-gpgpu126: task 0: Exited with exit code 1
