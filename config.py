@@ -35,6 +35,9 @@ class Config:
         parser.add_argument('--seed', type=int, default=42, help="Random seed for subset sampling")
 
         # parser.add_argument('--input_size', type=int, default=4, help="Number of workers for data loading")
+        # 导入模型权重
+        parser.add_argument('--weight_path', type=str, default='none',
+    help='可选：模型权重文件路径（留空则不加载）')
 
         # 兼容 Jupyter Notebook
         if custom_args is not None:

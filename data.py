@@ -149,7 +149,43 @@ def prepare_additive_data(dataset, data_path, preprocess, test_process=None,
             'train': DataLoader(train_data, batch_size, shuffle = shuffle, num_workers=8,pin_memory=pin_memory),
             'test': DataLoader(test_data, batch_size, shuffle = False, num_workers=8,pin_memory=pin_memory),
         }
+    # ---- DomainNet：data_root/domainnet/<subdomain> ----
+    elif dataset.startswith("domainnet/"):
+        if "/" in dataset:
+            main_ds, sub_ds = dataset.split("/", 1)
+        else:
+            main_ds, sub_ds = dataset, None
+        valid_domains = {"clipart", "infograph", "painting", "quickdraw", "real", "sketch"}
+        if sub_ds not in valid_domains:
+            raise ValueError(f"Use dataset like 'domainnet/<subdomain>', where <subdomain> in {sorted(valid_domains)}")
+
+        # domain_root = os.path.join(data_path, "domainnet", sub_ds)
+        if not os.path.isdir(data_path):
+            raise FileNotFoundError(f"Expected subdomain folder: {data_path}")
+
+        # 一次性加载整个子域（每个子文件夹即一个类别）
+        full_data = datasets.ImageFolder(root=data_path, transform=preprocess)
+        class_names = refine_classnames(list(full_data.classes))
+        full_data = _subset_by_percent(full_data, train_percent, seed)
+        
+
+        # 按 8:2 随机切分为 train/test（固定种子保证可复现）
+        n_total = len(full_data)
+        n_train = int(0.8 * n_total)
+        n_test  = n_total - n_train
+        g = torch.Generator().manual_seed(seed)
+        train_data, test_data = torch.utils.data.random_split(full_data, [n_train, n_test], generator=g)
+
+        loaders = {
+            "train": DataLoader(train_data, batch_size, shuffle=shuffle, num_workers=8, pin_memory=pin_memory),
+            "test":  DataLoader(test_data,  batch_size, shuffle=False,  num_workers=8, pin_memory=pin_memory),
+        }
+
+
+    
     else:
         raise NotImplementedError(f"{dataset} not supported")
 
     return loaders, class_names
+
+

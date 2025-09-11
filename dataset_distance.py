@@ -27,7 +27,6 @@ USAGE (per-class comparison, e.g., compare clipart\\<cls> vs real\\<cls> for all
 
 from typing import Optional, Tuple, Dict, List
 import os
-from pathlib import Path
 import glob
 import csv
 import time
@@ -83,10 +82,10 @@ def _has_class_subdirs(root: str) -> bool:
         raise
 
 def _list_immediate_subdirs(root: str) -> List[str]:
-    root = Path(root).expanduser().resolve()
-    if not root.is_dir():
-        raise FileNotFoundError(f"[dataset_distance] Directory not found: {root}")
-    return sorted([d.name for d in root.iterdir() if d.is_dir()])
+    try:
+        return sorted([d.name for d in os.scandir(root) if d.is_dir()])
+    except FileNotFoundError:
+        raise
 
 # -----------------------------
 # InceptionV3 feature extractor
@@ -131,11 +130,11 @@ class InceptionV3Features(nn.Module):
         return self.backbone(x)
 
     def dataloader(self, root: str, batch_size: int = 64, num_workers: int = 2, shuffle: bool = False) -> DataLoader:
-        root = str(Path(root).expanduser().resolve())
         if _has_class_subdirs(root):
             ds = self._datasets.ImageFolder(root=root, transform=self.preprocess)
         else:
             ds = FlatImageDataset(root=root, transform=self.preprocess)
+        
         return DataLoader(ds, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers, pin_memory=True)
 
     @torch.no_grad()

@@ -29,7 +29,6 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import os
 from typing import Dict, List, Tuple
 
@@ -151,15 +150,8 @@ def main(args):
     p.add_argument("--pca-d", type=int, default=None)
     p.add_argument("--out-prefix", type=str, default="domainnet")
     p.add_argument("--save-json", action="store_true")
-    # Use pre-supplied fixed args; do NOT parse CLI here
+    args = p.parse_args()
 
-    args = args
-
-    # Normalize critical paths
-
-    args.root = os.path.abspath(os.path.expanduser(getattr(args, "root", "./data")))
-
-    args.out_prefix = os.path.abspath(os.path.expanduser(getattr(args, "out_prefix", "outputs/domainnet")))
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
     fe = dd.InceptionV3Features(device=device)
 
@@ -214,22 +206,18 @@ def main(args):
 if __name__ == "__main__":
     class Args: pass
     args = Args()
-    args.root = "/tmp/mr_testset"
-    args.root = "/data/gpfs/projects/punim1943/domainnet"
+    args.root = "./data"
     args.domains = "clipart,infograph,painting,quickdraw,real,sketch"
-    args.device = "cpu"
+    args.device = "cuda"
     args.batch = 64
     args.num_workers = 4
-    args.max_batches = None
     args.kid_subsets = 100
     args.kid_size = 100
-    args.mmd_sigma = None
     args.sw_proj = 128
     args.kl_symmetric = True
     args.kl_diag = True
     args.pca_d = 256
-    args.out_prefix = "/data/gpfs/projects/punim1943/xunli/mr_benchmark/outputs/domainnet"
-    # args.out_prefix = "/tmp/mr_test_outputs/domainnet"
+    args.out_prefix = "outputs/domainnet"
     args.save_json = True
 
     main(args)
