@@ -64,3 +64,20 @@ IMAGENETNORMALIZE = {
     'mean': [0.485, 0.456, 0.406],
     'std': [0.229, 0.224, 0.225],
 }
+
+
+config_vm = {'lr': 0.01, 'epoch': 200,
+             'blmp': {'lap': 1, 'topk_ratio': 0.15},
+             'blm': {'lap': 1},
+             'ft_lr': 0.1
+             }
+
+
+config_vlm = {'lr': 40, 'epoch': 200,
+              'blmp': {'lap': 1, 'topk_ratio': 0.15},
+              'blm': {'lap': 1}
+              }
+config_vm_fast = {'lr': 0.01, 'epoch': 200,
+             'blmp': {'lap': 1, 'topk_ratio': 0.15},
+             'blm': {'lap': 1}
+             }

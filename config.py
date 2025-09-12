@@ -27,7 +27,7 @@ class Config:
         parser.add_argument('--batch_size', type=int, default=256)
         parser.add_argument('--shuffle', type=bool, default=True)
         parser.add_argument('--output_dim', type=int, default=10, help="target dataset dimension")
-
+        parser.add_argument("--epochs",type=int,default=50)
         # 控制训练数据集比例
         parser.add_argument('--train_percent', type=int, default=100,
                     choices=[20, 40, 60, 80, 100],

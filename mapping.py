@@ -4,8 +4,6 @@ import torch.nn.functional as F
 import torch
 import torch.nn as nn
 
-
-# 把 [B, S] 的源空间 logits（S=源类数，如 1000）按列索引重排/选取成目标空间 [B, T]（T=目标类数，如 10）
 def label_mapping_base(logits, mapping_sequence):
     '''
     :param logits: output of the pretrained model
@@ -15,9 +13,6 @@ def label_mapping_base(logits, mapping_sequence):
     modified_logits = logits[:, mapping_sequence]
     return modified_logits
 
-
-
-#把 [B, S] 的 logits 右乘一个 实值权重矩阵 [S, T] 得到 [B, T]。
 def label_mapping_calculation(logits, mapping_matrix):
     '''
     :param logits: output of the pretrained model
@@ -26,8 +21,6 @@ def label_mapping_calculation(logits, mapping_matrix):
     '''
     modified_logits = torch.mm(logits, mapping_matrix)
     return modified_logits
-
-# 统计一个频次矩阵 freq_matrix ∈ R^{S×T}，其中 freq[i, j] = 在“目标类 j”的样本里，黑盒 argmax 预测为“源类 i”的样本数。
 
 def get_freq_distribution(fx, y):
     '''
@@ -40,8 +33,6 @@ def get_freq_distribution(fx, y):
     freq_matrix = torch.cat(freq_matrix, dim=1)
     return freq_matrix
 
-
-# 根据频次矩阵做贪心匹配，产出 0/1 矩阵 [S, T]，每列正好一个 1（每个目标类选一个源类）。
 def greedy_mapping(freq_matrix):
     '''
     :param freq_matrix: frequency distribution matrix of [source predicted labels, target ground truth labels]
@@ -58,8 +49,6 @@ def greedy_mapping(freq_matrix):
             freq_matrix[:, loc[1]] = -1
     return mapping_matrix
 
-
-# 1 对 1”映射（ILM/FLM）
 def one2one_mappnig_matrix(visual_prompt, network, data_loader):
     '''
     The optimal one-to-one label mapping (for FLM, ILM)
@@ -68,7 +57,7 @@ def one2one_mappnig_matrix(visual_prompt, network, data_loader):
     :param data_loader: Dataloader for downstream tasks
     :return: optimal one-to-one label mapping
     '''
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = next(visual_prompt.parameters()).device
     if hasattr(network, "eval"):
         network.eval()
     fx0s = []
@@ -96,7 +85,7 @@ def blm_reweight_matrix(visual_prompt, network, data_loader, lap=1):
     :param lap: laplace smooth factor - $\lambda$
     :return: optimal real reweight mapping matrix
     '''
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = next(visual_prompt.parameters()).device
     if hasattr(network, "eval"):
         network.eval()
     fx0s = []
@@ -135,7 +124,7 @@ def blmp_reweight_matrix(visual_prompt, network, data_loader, lap=0, k=3):
     :param k: Top k factor
     :return: optimal real reweight mapping matrix
     '''
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = next(visual_prompt.parameters()).device
     if hasattr(network, "eval"):
         network.eval()
     probs_list = []
@@ -251,4 +240,3 @@ class FTlayer(nn.Module):
         else:
             weights = self.linear.weight
         return x @ weights.T
-    

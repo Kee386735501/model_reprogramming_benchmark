@@ -64,9 +64,15 @@ def run_experiments(args):
         scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[5, 8], gamma=0.1)
         
         # 3. 将 writer 传入训练函数
+        # best_acc, _ = train_visual_prompt_with_mapping(
+        #     network=blackbox_model, visual_prompt=visual_prompt, loaders=loaders,
+        #     epochs=50, optimizer=optimizer, scheduler=scheduler, device=args.device,
+        #     mapping_mode=args.mapping_mode, class_names=class_names,
+        #     pretrain_num_classes=args.input_dim, writer=writer
+        # )
         best_acc, _ = train_visual_prompt_with_mapping(
             network=blackbox_model, visual_prompt=visual_prompt, loaders=loaders,
-            epochs=50, optimizer=optimizer, scheduler=scheduler, device=args.device,
+            epochs=args.epochs, optimizer=optimizer, scheduler=scheduler, device=args.device,
             mapping_mode=args.mapping_mode, class_names=class_names,
             pretrain_num_classes=args.input_dim, writer=writer
         )
